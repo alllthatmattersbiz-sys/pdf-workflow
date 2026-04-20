@@ -5,6 +5,7 @@ import tempfile
 import os
 from dotenv import load_dotenv
 from anthropic import Anthropic
+from slack_integration import send_slack_notification
 
 load_dotenv()
 
@@ -66,5 +67,16 @@ if uploaded_file:
                     st.success("✅ Saved to Notion!")
                 else:
                     st.error("❌ Failed to save to Notion")
+
+            # Send Slack notification
+            with st.spinner("Sending Slack notification..."):
+                 slack_success = send_slack_notification(
+                     file_name=uploaded_file.name,
+                     task=task,
+                     claude_response=result
+                )
     
-    os.remove(tmp_path)
+                 if slack_success:
+                     st.info("📢 Slack notification sent!")
+    
+    os.remove(tmp_path) 
